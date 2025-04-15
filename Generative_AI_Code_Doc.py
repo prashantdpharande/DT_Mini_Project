@@ -68,7 +68,20 @@ def generate_ai_description(code, file_path):
                   {"role": "user", "content": prompt}]
     )
     return response["choices"][0]["message"]["content"]
+def structure_code_1(code):
+    """Parses Python code to extract functions, classes, and docstrings."""
+    tree = ast.parse(code)
+    extracted_data = {"classes": [], "functions": []}
 
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef):
+            docstring = ast.get_docstring(node) or "No docstring provided."
+            extracted_data["classes"].append((node.name, docstring))
+        elif isinstance(node, ast.FunctionDef):
+            docstring = ast.get_docstring(node) or "No docstring provided."
+            extracted_data["functions"].append((node.name, docstring))
+
+    return extracted_data
 def generate_docx():
     """Generates a structured Word document with AI-generated documentation."""
     doc = Document()
